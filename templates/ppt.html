@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Generate PPT | Smart PDF App{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h3 class="text-center mb-4">🛠️ Generate Your Presentation</h3>
+
+  <form method="POST" class="mb-4">
+    <div class="mb-3 text-center">
+      <label for="filename" class="form-label">Enter PPT file name (without .pptx):</label>
+      <input type="text" name="filename" id="filename" class="form-control w-50 mx-auto" required>
+    </div>
+    <div class="text-center">
+      <button type="submit" class="btn btn-primary">⚙️ Generate PPT</button>
+    </div>
+  </form>
+
+  <div class="text-center mb-4">
+    <a href="{{ url_for('upload') }}" class="btn btn-secondary">🔙 Go Back to Upload Page</a>
+  </div>
+
+  {% if generated %}
+    <hr>
+
+    {% if no_content %}
+      <div class="alert alert-warning text-center" role="alert">
+        ⚠️ No valid slide content found. Please check your PDF and try again.
+      </div>
+    {% else %}
+      <div class="alert alert-success text-center" role="alert">
+        ✅ Presentation generated successfully!
+      </div>
+
+      <div class="text-center mt-4">
+        <a href="{{ url_for('download_ppt') }}" class="btn btn-success">⬇️ Download {{ filename }}.pptx</a>
+      </div>
+
+      <div class="text-center mt-3">
+        <a href="{{ url_for('upload') }}" class="btn btn-secondary">🔙 Go Back to Upload Page</a>
+      </div>
+
+      <div class="mt-5">
+        <h5 class="text-center">📝 Slide Titles & Content Summary</h5>
+        <ul class="list-group w-75 mx-auto mt-3">
+          {% for s in summaries %}
+            <li class="list-group-item">
+              <strong>Slide {{ loop.index }}:</strong> {{ s.title }}
+              {% if s.bullet_points %}
+                <ul class="mt-2">
+                  {% for line in s.bullet_points.split('\n') %}
+                    <li>{{ line }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

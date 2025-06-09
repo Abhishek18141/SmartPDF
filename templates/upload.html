@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Upload PDF | Smart PDF App{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-secondary text-white text-center">
+        <h4>📄 Upload PDF & Choose Page Range</h4>
+      </div>
+      <div class="card-body">
+
+        <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data" class="needs-validation" novalidate>
+          <div class="mb-3">
+            <label for="pdf_file" class="form-label">Select PDF File</label>
+            <input type="file" class="form-control" id="pdf_file" name="pdf_file" accept=".pdf" required>
+            <div class="invalid-feedback">Please upload a valid PDF file.</div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="start_page" class="form-label">Start Page</label>
+              <input type="number" class="form-control" id="start_page" name="start_page" min="1" required>
+              <div class="invalid-feedback">Enter a valid start page.</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="end_page" class="form-label">End Page</label>
+              <input type="number" class="form-control" id="end_page" name="end_page" min="1" required>
+              <div class="invalid-feedback">Enter a valid end page.</div>
+            </div>
+          </div>
+
+          <div id="page-range-error" class="text-danger text-center mb-3" style="display: none;">
+            ❌ Invalid range: Start Page must be ≤ End Page and within total pages.
+          </div>
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+            <button type="submit" name="action" value="qa" class="btn btn-outline-primary px-4" id="qaBtn" disabled>💬 Q&A</button>
+	    <button type="submit" name="action" value="ppt" class="btn btn-outline-success px-4" id="pptBtn" disabled>📊 Generate PPT</button>
+
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

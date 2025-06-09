@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}API Key Setup | Smart PDF App{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-info text-white text-center">
+        <h4>🔑 Enter Your Google Gemini API Key</h4>
+      </div>
+      <div class="card-body">
+
+        <!-- ✅ Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <!-- Intro Message -->
+        <p class="text-muted">
+          To use Google Gemini to generate slides from your PDFs, we need your API key. This key allows us to securely connect with Gemini services and generate intelligent slide content for you.
+        </p>
+
+        <!-- API Key Form -->
+        <form method="POST" action="{{ url_for('apikey') }}" id="apikey-form" novalidate>
+          <div class="mb-3">
+            <label for="api_key" class="form-label">Google API Key</label>
+            <input
+              type="text"
+              class="form-control"
+              id="api_key"
+              name="api_key"
+              required
+              minlength="20"
+              maxlength="100"
+              pattern="^[A-Za-z0-9-_]+$"
+              placeholder="Paste your Gemini API key here"
+              autocomplete="off"
+              autofocus
+            >
+            <div class="invalid-feedback">
+              Please enter a valid API key (alphanumeric, 20-100 chars).
+            </div>
+          </div>
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary" id="submit-btn">💾 Save & Continue</button>
+          </div>
+        </form>
+
+        <hr>
+
+        <!-- How to Get API Key -->
+        <div class="alert alert-secondary mt-4">
+          <h6>📘 How to Get Your API Key:</h6>
+          <ol class="mb-0">
+            <li>Go to <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener">Google MakerSuite</a></li>
+            <li>Sign in with your Google account</li>
+            <li>Click <strong>“Create API Key”</strong></li>
+            <li>Copy and paste the key above</li>
+          </ol>
+        </div>
+
+        <!-- Gemini API Usage Info -->
+        <div class="alert alert-warning mt-4">
+          <h6>💡 What You Get with the Free Gemini API:</h6>
+          <ul class="mb-0">
+            <li>Access to <strong>Gemini 1.5 Flash</strong> model</li>
+            <li>Supports up to <strong>128k tokens</strong> (massive context)</li>
+            <li><strong>60 free minutes</strong> per month</li>
+            <li>Text input/output support; multimodal varies by endpoint</li>
+            <li>Subject to <a href="https://ai.google.dev/pricing" target="_blank" rel="noopener">Google pricing & limits</a></li>
+          </ul>
+        </div>
+
+        <!-- Security Note -->
+        <div class="alert alert-danger mt-4">
+          <h6>🔒 Security Note:</h6>
+          <p class="mb-0">
+            Your API key is securely stored in your session only — it is never shared or logged. It is used solely to call Gemini and generate your slide content.
+          </p>
+        </div>
+
+        <!-- Optional Link to Docs -->
+        <div class="mt-4 text-center">
+          <a href="https://ai.google.dev/gemini-api/docs" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm">📄 View Gemini API Docs</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
