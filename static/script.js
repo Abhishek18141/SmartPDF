@@ -97,4 +97,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   startPageInput.addEventListener("input", validatePageRange);
   endPageInput.addEventListener("input", validatePageRange);
+
+  // ✅ Password visibility toggle
+  const togglePasswordBtn = document.getElementById("togglePassword");
+  const passwordInput = document.getElementById("password");
+  const toggleIcon = document.getElementById("toggleIcon");
+
+  if (togglePasswordBtn && passwordInput && toggleIcon) {
+    togglePasswordBtn.addEventListener("click", () => {
+      const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+      passwordInput.setAttribute("type", type);
+      toggleIcon.classList.toggle("bi-eye");
+      toggleIcon.classList.toggle("bi-eye-slash");
+    });
+  }
 });
