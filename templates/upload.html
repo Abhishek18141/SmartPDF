@@ -18,15 +18,21 @@
             <div class="invalid-feedback">Please upload a valid PDF file.</div>
           </div>
 
+          <!-- Loading spinner -->
+          <div id="loadingIndicator" class="text-center text-info my-3" style="display: none;">
+            <div class="spinner-border text-info" role="status"></div>
+            <div>Getting total pages, please wait...</div>
+          </div>
+
           <div class="row">
             <div class="col-md-6 mb-3">
               <label for="start_page" class="form-label">Start Page</label>
-              <input type="number" class="form-control" id="start_page" name="start_page" min="1" required>
+              <input type="number" class="form-control" id="start_page" name="start_page" min="1" required disabled>
               <div class="invalid-feedback">Enter a valid start page.</div>
             </div>
             <div class="col-md-6 mb-3">
               <label for="end_page" class="form-label">End Page</label>
-              <input type="number" class="form-control" id="end_page" name="end_page" min="1" required>
+              <input type="number" class="form-control" id="end_page" name="end_page" min="1" required disabled>
               <div class="invalid-feedback">Enter a valid end page.</div>
             </div>
           </div>
@@ -37,8 +43,7 @@
 
           <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
             <button type="submit" name="action" value="qa" class="btn btn-outline-primary px-4" id="qaBtn" disabled>💬 Q&A</button>
-	    <button type="submit" name="action" value="ppt" class="btn btn-outline-success px-4" id="pptBtn" disabled>📊 Generate PPT</button>
-
+            <button type="submit" name="action" value="ppt" class="btn btn-outline-success px-4" id="pptBtn" disabled>📊 Generate PPT</button>
           </div>
         </form>
 
@@ -46,4 +51,121 @@
     </div>
   </div>
 </div>
+
+<script>
+(() => {
+  'use strict';
+
+  const forms = document.querySelectorAll('.needs-validation');
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      const isPageValid = validatePageRange();
+      if (!form.checkValidity() || !isPageValid) {
+        event.preventDefault();
+        event.stopPropagation();
+      } else {
+        const submitButtons = form.querySelectorAll("button[type='submit']");
+        submitButtons.forEach(btn => {
+          btn.disabled = true;
+          btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Processing...`;
+        });
+      }
+      form.classList.add('was-validated');
+    }, false);
+  });
+})();
+
+document.addEventListener("DOMContentLoaded", () => {
+  const pdfInput = document.getElementById("pdf_file");
+  const startPageInput = document.getElementById("start_page");
+  const endPageInput = document.getElementById("end_page");
+  const errorMsg = document.getElementById("page-range-error");
+  const qaBtn = document.getElementById("qaBtn");
+  const pptBtn = document.getElementById("pptBtn");
+  const loadingIndicator = document.getElementById("loadingIndicator");
+
+  let totalPages = 0;
+  let pdfUploaded = false;
+
+  function toggleButtons(state) {
+    qaBtn.disabled = !state;
+    pptBtn.disabled = !state;
+  }
+
+  function validatePageRange() {
+    const start = parseInt(startPageInput.value);
+    const end = parseInt(endPageInput.value);
+    const isValid = (
+      !isNaN(start) &&
+      !isNaN(end) &&
+      start >= 1 &&
+      end >= 1 &&
+      start <= end &&
+      end <= totalPages
+    );
+    errorMsg.style.display = isValid ? "none" : "block";
+    toggleButtons(pdfUploaded && isValid);
+    return isValid;
+  }
+
+  pdfInput.addEventListener("change", () => {
+    const file = pdfInput.files[0];
+    if (!file) {
+      pdfUploaded = false;
+      toggleButtons(false);
+      return;
+    }
+
+    // Disable inputs and show loading
+    startPageInput.disabled = true;
+    endPageInput.disabled = true;
+    toggleButtons(false);
+    loadingIndicator.style.display = "block";
+
+    const formData = new FormData();
+    formData.append("pdf_file", file);
+
+    fetch("/get_page_count", {
+      method: "POST",
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      loadingIndicator.style.display = "none";
+
+      if (data.success) {
+        totalPages = data.total_pages;
+
+        startPageInput.min = 1;
+        startPageInput.max = totalPages;
+        endPageInput.min = 1;
+        endPageInput.max = totalPages;
+
+        startPageInput.value = 1;
+        endPageInput.value = totalPages;
+
+        // Enable inputs
+        startPageInput.disabled = false;
+        endPageInput.disabled = false;
+
+        pdfUploaded = true;
+        validatePageRange();
+      } else {
+        alert(data.error || "❌ Failed to read PDF.");
+        pdfUploaded = false;
+        toggleButtons(false);
+      }
+    })
+    .catch(() => {
+      loadingIndicator.style.display = "none";
+      alert("❌ Could not contact server. Check your connection.");
+      pdfUploaded = false;
+      toggleButtons(false);
+    });
+  });
+
+  startPageInput.addEventListener("input", validatePageRange);
+  endPageInput.addEventListener("input", validatePageRange);
+});
+</script>
 {% endblock %}
