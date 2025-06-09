@@ -1,4 +1,4 @@
-(() => {
+(() => { 
   'use strict';
 
   const forms = document.querySelectorAll('.needs-validation');
@@ -12,7 +12,7 @@
         const submitButtons = form.querySelectorAll("button[type='submit']");
         submitButtons.forEach(btn => {
           btn.disabled = true;
-          btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Processing...`;
+          btn.innerHTML = <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Processing...;
         });
       }
       form.classList.add('was-validated');
@@ -97,18 +97,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   startPageInput.addEventListener("input", validatePageRange);
   endPageInput.addEventListener("input", validatePageRange);
-
-  // ✅ Password visibility toggle
-  const togglePasswordBtn = document.getElementById("togglePassword");
-  const passwordInput = document.getElementById("password");
-  const toggleIcon = document.getElementById("toggleIcon");
-
-  if (togglePasswordBtn && passwordInput && toggleIcon) {
-    togglePasswordBtn.addEventListener("click", () => {
-      const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
-      passwordInput.setAttribute("type", type);
-      toggleIcon.classList.toggle("bi-eye");
-      toggleIcon.classList.toggle("bi-eye-slash");
-    });
-  }
 });
