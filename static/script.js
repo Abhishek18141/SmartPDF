@@ -1,4 +1,5 @@
-(() => { 
+<script>
+(() => {
   'use strict';
 
   const forms = document.querySelectorAll('.needs-validation');
@@ -12,7 +13,7 @@
         const submitButtons = form.querySelectorAll("button[type='submit']");
         submitButtons.forEach(btn => {
           btn.disabled = true;
-          btn.innerHTML = <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Processing...;
+          btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Processing...`;
         });
       }
       form.classList.add('was-validated');
@@ -27,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const errorMsg = document.getElementById("page-range-error");
   const qaBtn = document.getElementById("qaBtn");
   const pptBtn = document.getElementById("pptBtn");
+  const loadingIndicator = document.getElementById("loadingIndicator");
 
   let totalPages = 0;
   let pdfUploaded = false;
@@ -60,6 +62,12 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    // Disable inputs and show loading
+    startPageInput.disabled = true;
+    endPageInput.disabled = true;
+    toggleButtons(false);
+    loadingIndicator.style.display = "block";
+
     const formData = new FormData();
     formData.append("pdf_file", file);
 
@@ -69,6 +77,8 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .then(response => response.json())
     .then(data => {
+      loadingIndicator.style.display = "none";
+
       if (data.success) {
         totalPages = data.total_pages;
 
@@ -80,6 +90,10 @@ document.addEventListener("DOMContentLoaded", () => {
         startPageInput.value = 1;
         endPageInput.value = totalPages;
 
+        // Enable inputs
+        startPageInput.disabled = false;
+        endPageInput.disabled = false;
+
         pdfUploaded = true;
         validatePageRange();
       } else {
@@ -89,6 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     })
     .catch(() => {
+      loadingIndicator.style.display = "none";
       alert("❌ Could not contact server. Check your connection.");
       pdfUploaded = false;
       toggleButtons(false);
@@ -98,3 +113,4 @@ document.addEventListener("DOMContentLoaded", () => {
   startPageInput.addEventListener("input", validatePageRange);
   endPageInput.addEventListener("input", validatePageRange);
 });
+</script>
